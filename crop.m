@@ -11,6 +11,8 @@ ax = axes(f);
 loop1 = true;
 while loop1
     plot(ax,obj.Time,[obj.ActivityIndex,obj.CircadianStimulus])
+    title(ax,obj.ID,'Interpreter','none')
+    legend(ax,'AI','CS')
     
     uiwait(msgbox('Select start of observation.','','modal'));
     [x1,~] = zoompick(ax);
@@ -20,6 +22,8 @@ while loop1
     
     idx = datenum(obj.Time) >= x1 & datenum(obj.Time) < x2;
     plot(ax,obj.Time(idx),[obj.ActivityIndex(idx),obj.CircadianStimulus(idx)])
+    title(ax,obj.ID,'Interpreter','none')
+    legend(ax,'AI','CS')
     
     button = questdlg('Is this selection correct?',...
         'Confirm','Yes','No','Yes');
