@@ -145,7 +145,7 @@ if strcmpi(button,'Yes')
             button = questdlg('Is this selection correct?','','Yes','No','Yes');
             if strcmpi(button,'Yes')
                 idx = datenum(obj.Time) >= x1 & datenum(obj.Time) < x2;
-                obj.Error = obj.Error | idx;
+                obj.Compliance = obj.Copmliance & ~idx;
                 loop2 = false;
             else
                 delete(h);
