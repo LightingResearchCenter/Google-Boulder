@@ -7,7 +7,7 @@ timestamp = datestr(now,'yyyy-mm-dd HH-MM');
 d12packDir = fullfile(githubDir,'d12pack');
 addpath(d12packDir);
 
-projectDir = '\\ROOT\projects\Google-Boulder\DaysimeterData';
+projectDir = '\\ROOT\projects\Google-Boulder\DaysimeterData\fall';
 dataDir = projectDir;
 saveDir = fullfile(projectDir,'tables');
 

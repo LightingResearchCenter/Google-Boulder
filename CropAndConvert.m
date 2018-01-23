@@ -14,7 +14,7 @@ timestamp = datestr(now,'yyyy-mm-dd_HHMM');
 rootDir = '\\root\projects';
 calPath = fullfile(rootDir,'DaysimeterAndDimesimeterReferenceFiles',...
     'recalibration2016','calibration_log.csv');
-prjDir  = fullfile(rootDir,'Google-Boulder','DaysimeterData');
+prjDir  = fullfile(rootDir,'Google-Boulder','DaysimeterData','fall');
 orgDir  = fullfile(prjDir,'originalData');
 dbName  = [timestamp,'.mat'];
 dbPath  = fullfile(prjDir,dbName);

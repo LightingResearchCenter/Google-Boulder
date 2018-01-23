@@ -11,8 +11,24 @@ ax = axes(f);
 loop1 = true;
 while loop1
     plot(ax,obj.Time,[obj.ActivityIndex,obj.CircadianStimulus])
+    ax.XLimMode = 'manual';
+    ax.YLimMode = 'manual';
+    ax.YLim = [0,max(obj.CircadianStimulus)];
+    if verLessThan('matlab','R2016b')
+        ax.XLim = [floor(min(datenum(obj.Time))),ceil(max(datenum(obj.Time)))];
+    else
+        ax.XLim = [dateshift(min(obj.Time),'start','day'),dateshift(max(obj.Time),'end','day')];
+    end
     title(ax,obj.ID,'Interpreter','none')
     legend(ax,'AI','CS')
+    
+    if ~isempty(obj.BedLog)
+        hold(ax,'on');
+        h = area(ax,obj.Time,obj.InBed);
+        h.FaceColor = [186, 141, 186]/255;
+        uistack(h,'bottom');
+        hold(ax,'off');
+    end
     
     uiwait(msgbox('Select start of observation.','','modal'));
     [x1,~] = zoompick(ax);
@@ -20,10 +36,31 @@ while loop1
     uiwait(msgbox('Select end of observation.','','modal'));
     [x2,~] = zoompick(ax);
     
-    idx = datenum(obj.Time) >= x1 & datenum(obj.Time) < x2;
+    if verLessThan('matlab','R2016b')
+        idx = datenum(obj.Time) >= x1 & datenum(obj.Time) < x2;
+    else
+        idx = obj.Time >= x1 & obj.Time < x2;
+    end
+    
     plot(ax,obj.Time(idx),[obj.ActivityIndex(idx),obj.CircadianStimulus(idx)])
+    ax.XLimMode = 'manual';
+    ax.YLimMode = 'manual';
+    ax.YLim = [0,1];
+    if verLessThan('matlab','R2016b')
+        ax.XLim = [floor(min(datenum(obj.Time(idx)))),ceil(max(datenum(obj.Time(idx))))];
+    else
+        ax.XLim = [dateshift(min(obj.Time(idx)),'start','day'),dateshift(max(obj.Time(idx)),'end','day')];
+    end
     title(ax,obj.ID,'Interpreter','none')
     legend(ax,'AI','CS')
+    
+    if ~isempty(obj.BedLog)
+        hold(ax,'on');
+        h = area(ax,obj.Time(idx),obj.InBed(idx));
+        h.FaceColor = [186, 141, 186]/255;
+        uistack(h,'bottom');
+        hold(ax,'off');
+    end
     
     button = questdlg('Is this selection correct?',...
         'Confirm','Yes','No','Yes');
@@ -34,6 +71,7 @@ while loop1
 end
 
 %% Bed cropping
+if isempty(obj.BedLog)
 button = questdlg('Would you like to select bed times?','','Yes','No','Yes');
 if strcmpi(button,'Yes')
     loop1 = true;
@@ -77,6 +115,7 @@ if strcmpi(button,'Yes')
         
     end
 end
+end
 
 %% Error cropping
 button = questdlg('Would you like to select device errors?','','Yes','No','Yes');
@@ -103,7 +142,11 @@ if strcmpi(button,'Yes')
             
             button = questdlg('Is this selection correct?','','Yes','No','Yes');
             if strcmpi(button,'Yes')
-                idx = datenum(obj.Time) >= x1 & datenum(obj.Time) < x2;
+                if verLessThan('matlab','R2016b')
+                    idx = datenum(obj.Time) >= x1 & datenum(obj.Time) < x2;
+                else
+                    idx = obj.Time >= x1 & obj.Time < x2;
+                end
                 obj.Error = obj.Error | idx;
                 loop2 = false;
             else
@@ -144,8 +187,12 @@ if strcmpi(button,'Yes')
             
             button = questdlg('Is this selection correct?','','Yes','No','Yes');
             if strcmpi(button,'Yes')
-                idx = datenum(obj.Time) >= x1 & datenum(obj.Time) < x2;
-                obj.Compliance = obj.Copmliance & ~idx;
+                if verLessThan('matlab','R2016b')
+                    idx = datenum(obj.Time) >= x1 & datenum(obj.Time) < x2;
+                else
+                    idx = obj.Time >= x1 & obj.Time < x2;
+                end
+                obj.Compliance = obj.Compliance & ~idx;
                 loop2 = false;
             else
                 delete(h);
@@ -168,12 +215,24 @@ end
 %%
 function [x,y] = zoompick(ax)
 clc
+x0 = ax.XLim(1);
+y0 = ax.YLim(1);
+
 zoom(ax,'on')
 display('Press SPACE BAR to continue');
 ax.Parent.CurrentCharacter = 'z';
 waitfor(ax.Parent,'CurrentCharacter',char(32));
 zoom(ax,'off')
-[x,y] = ginput(1);
+[x1,y1] = ginput(1);
+
+if ~verLessThan('matlab','R2016b')
+    x = x1 + x0;
+    y = y1 + y0;
+else
+    x = x1;
+    y = y1;
+end
+
 zoom(ax,'out')
 clc
 end
